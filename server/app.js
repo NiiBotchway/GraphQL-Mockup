@@ -3,21 +3,18 @@ const { graphqlHTTP } = require('express-graphql')
 const morgan = require('morgan')
 const schema = require('./schema/schema')
 const mongoose = require('mongoose')
+//const { PORT, NODE_ENV, MONGODB_URI } = require('./config')
+const { property } = require('lodash')
 
 const app = express()
 
-const dbURI =
-	'mongodb+srv://nabot:ishi4u@GQL@gql.qzcay.mongodb.net/gql?retryWrites=true&w=majority'
-//mongoose.connect(dbURI)
-// mongoose.connection.once('open', () => {
-// 	console.log('connected to database')
-// })
+const dbURI = process.env.MONGODB_URI
 
 mongoose
 	.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
 	.then(() => {
-		app.listen(3000, () => {
-			console.log('listening for request on port 3000')
+		app.listen(process.env.PORT || 5000, () => {
+			console.log(`listening for request on port ${process.env.PORT || 5000}`)
 		})
 	})
 	.catch((err) => console.log(err))
@@ -29,9 +26,5 @@ app.use(
 		graphiql: true,
 	})
 )
-
-// app.listen(3000, () => {
-// 	console.log('listening for request on port 3000')
-// })
 
 app.use(morgan('dev'))
