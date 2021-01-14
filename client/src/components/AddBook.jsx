@@ -1,19 +1,19 @@
 import React from 'react'
-import { gql } from 'apollo-boost'
 import { graphql } from 'react-apollo'
-
-const getAuthorsQuery = gql`
-	{
-		authors {
-			id
-			name
-		}
-	}
-`
+import { flowRight as compose } from 'lodash'
+import {
+	getAuthorsQuery,
+	addBookMutation,
+	getBooksQuery,
+} from '../queries/queries'
 
 function AddBook(props) {
+	const [name, setName] = React.useState('')
+	const [genre, setGenre] = React.useState('')
+	const [authorId, setAuthorId] = React.useState(-1)
+
 	const DisplayAuthors = () => {
-		let data = props.data
+		let data = props.getAuthorsQuery
 		return data.loading ? (
 			<option disabled>Loading Authors...</option>
 		) : (
@@ -27,21 +27,54 @@ function AddBook(props) {
 		)
 	}
 
+	const submitForm = (e) => {
+		e.preventDefault()
+		// console.log('state', { name, genre, authorId })
+		props.addBookMutation({
+			variables: {
+				name,
+				genre,
+				authorId,
+			},
+			refetchQueries: [{ query: getBooksQuery }],
+		})
+		setName('')
+		setGenre('')
+		setAuthorId('-1')
+	}
+
 	return (
 		<div>
-			<form id='add-book'>
+			<form id='add-book' onSubmit={submitForm}>
 				<div className='field'>
 					<label htmlFor='book'>Book Name:</label>
-					<input type='text' name='book' id='book' />
+					<input
+						type='text'
+						name='book'
+						id='book'
+						onChange={(e) => setName(e.target.value)}
+						value={name}
+					/>
 				</div>
 				<div className='field'>
 					<label htmlFor='genre'>Genre:</label>
-					<input type='text' name='genre' id='genre' />
+					<input
+						type='text'
+						name='genre'
+						id='genre'
+						onChange={(e) => setGenre(e.target.value)}
+						value={genre}
+					/>
 				</div>
 				<div className='field'>
 					<label htmlFor='book'>Author:</label>
-					<select>
-						<option>Select Author</option>
+					<select
+						onChange={(e) => {
+							setAuthorId(e.target.value)
+							console.log(typeof e.target.value)
+						}}
+					>
+						<option value='-1'>Select Author</option>
 						{DisplayAuthors()}
 					</select>
 				</div>
@@ -52,4 +85,7 @@ function AddBook(props) {
 	)
 }
 
-export default graphql(getAuthorsQuery)(AddBook)
+export default compose(
+	graphql(getAuthorsQuery, { name: 'getAuthorsQuery' }),
+	graphql(addBookMutation, { name: 'addBookMutation' })
+)(AddBook)
