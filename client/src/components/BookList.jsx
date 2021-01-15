@@ -26,7 +26,7 @@ function BookList(props) {
 	}
 
 	return (
-		<div>
+		<div className='container'>
 			<ul id='book-list'>{DisplayBooks()}</ul>
 			<BookDetails bookId={id} />
 		</div>

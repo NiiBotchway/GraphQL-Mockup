@@ -10,7 +10,7 @@ import {
 function AddBook(props) {
 	const [name, setName] = React.useState('')
 	const [genre, setGenre] = React.useState('')
-	const [authorId, setAuthorId] = React.useState(-1)
+	const [authorId, setAuthorId] = React.useState(null)
 
 	const DisplayAuthors = () => {
 		let data = props.getAuthorsQuery
@@ -40,7 +40,7 @@ function AddBook(props) {
 		})
 		setName('')
 		setGenre('')
-		setAuthorId('-1')
+		setAuthorId(null)
 	}
 
 	return (
@@ -71,10 +71,9 @@ function AddBook(props) {
 					<select
 						onChange={(e) => {
 							setAuthorId(e.target.value)
-							console.log(typeof e.target.value)
 						}}
 					>
-						<option value='-1'>Select Author</option>
+						<option value={null}>Select Author</option>
 						{DisplayAuthors()}
 					</select>
 				</div>
